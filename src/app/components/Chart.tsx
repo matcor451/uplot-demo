@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import uPlot, { AlignedData, Options } from 'uplot';
 import UplotReact from 'uplot-react';
 import 'uplot/dist/uPlot.min.css';
@@ -105,12 +105,14 @@ export const Chart = ({ data, flags }: Props) => {
                 u.root.querySelector(".u-select")?.classList.add('border', 'border-dashed');
               }
             }
+            return null
           }
         },
         dblclick: (u, targ, handler) => {
           return e => {
             handler(e)
             u.root.querySelector(".u-select")?.classList.remove('border', 'border-dashed');
+            return null
           }
         }
       }

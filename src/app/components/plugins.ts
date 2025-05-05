@@ -2,7 +2,8 @@ import uPlot, { Options } from "uplot";
 import { Flag } from "../page";
 import { getFlagForPoint } from "./utils";
 
-export function seriesPointsPlugin(flags: Flag[] = []) {
+
+export const seriesPointsPlugin = (flags: Flag[] = []): uPlot.Plugin => {
   function drawFlagMarker(ctx: CanvasRenderingContext2D, cx: number, cy: number) {
     const shapeSize = 8
   
@@ -19,7 +20,8 @@ export function seriesPointsPlugin(flags: Flag[] = []) {
 
   function drawFlaggedPoints(u: uPlot, i: number, i0: number, i1: number) {
     const { ctx } = u;
-    const { _stroke, scale } = u.series[i];
+    // const { _stroke, scale } = u.series[i];
+    const { scale } = u.series[i];
 
     ctx.save();
 
@@ -44,7 +46,7 @@ export function seriesPointsPlugin(flags: Flag[] = []) {
     return true
   }
 
-  return {
+  const plugin: uPlot.Plugin = {
     opts: (u: uPlot, opts: Options) => {
       opts.series.forEach((s, i) => {
         if (i > 0) {
@@ -55,6 +57,8 @@ export function seriesPointsPlugin(flags: Flag[] = []) {
           });
         }
       });
-    }
+    },
+    hooks: {}
   };
+  return plugin
 }
