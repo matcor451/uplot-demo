@@ -19,12 +19,16 @@ const initHook = (u: uPlot) => {
   u.over.addEventListener(
     "keydown",
     (e) => {
-      const xStep = 2000
+      const xStep = 0.5
+      // const xStep = (u.scales.x.max! - u.scales.x.min!) * 0.1
       const yStep = 2
+      // const yStep = (u.scales['%'].max! - u.scales['%'].min!) * 0.1
       if (e.key === "ArrowLeft") {
         u.setScale('x', {min: u.scales.x.min! - xStep, max: u.scales.x.max! - xStep})
+        u.setScale('%', {min: u.scales['%'].min!, max: u.scales['%'].max!})
       } else if (e.key === "ArrowRight") {
         u.setScale('x', {min: u.scales.x.min! + xStep, max: u.scales.x.max! + xStep})
+        u.setScale('%', {min: u.scales['%'].min!, max: u.scales['%'].max!})
       } else if (e.key === 'ArrowUp') {
         u.setScale('%', {min: u.scales['%'].min! + yStep, max: u.scales['%'].max! + yStep})
       } else if (e.key === 'ArrowDown') {
