@@ -43,7 +43,11 @@ export const seriesPointsPlugin = (flags: Flag[] = []): uPlot.Plugin => {
     };
 
     ctx.restore();
-    return true
+
+    const thisSeries = u.series[i]
+    const visiblePoints = thisSeries.idxs![1] - thisSeries.idxs![0]
+    // If return is true then all points are rendered - breaks if too many!
+    return visiblePoints <= 10_000
   }
 
   const plugin: uPlot.Plugin = {
