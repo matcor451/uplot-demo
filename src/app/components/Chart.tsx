@@ -3,10 +3,10 @@ import React, { useRef, useState } from 'react';
 import uPlot, { AlignedData, Options } from 'uplot';
 import UplotReact from 'uplot-react';
 import 'uplot/dist/uPlot.min.css';
-// import './style.css'
 import { seriesFromData } from './utils';
 import { seriesPointsPlugin } from './plugins';
 import { Flag } from '../page';
+import { Button } from './Button';
 
 interface Props {
   data: number[][]
@@ -43,6 +43,7 @@ export const Chart = ({ data, flags }: Props) => {
   const [flagMode, setFlagMode] = useState(false)
 
   const containerDiv = useRef<HTMLDivElement>(null)
+  const plotRef = useRef<uPlot>(null)
 
   const toggleDark = () => {
     if (!containerDiv.current) return
@@ -145,22 +146,28 @@ export const Chart = ({ data, flags }: Props) => {
     ],
   };
 
+  const onUnZoom = () => {
+    const u = plotRef.current
+    if (!u) return
+    u.setScale('x', {min: u.data[0][0], max: u.data[0].at(-1)!})
+  }
+
   return (
       <div
         ref={containerDiv}
         className='w-full'
       >
-        <button
-          className='border-2 cursor-pointer'
-          onClick={() => setFlagMode(!flagMode)}
-        >
+        <Button onClick={() => setFlagMode(!flagMode)}>
           Toggle Flag Mode - {flagMode ? 'on' : 'off'}
-        </button>
-        <button className='border-2 cursor-pointer' onClick={toggleDark}>
+        </Button>
+        <Button onClick={onUnZoom}>
+          Reset Zoom
+        </Button>
+        <Button onClick={toggleDark}>
           Toggle Dark Mode
-        </button>
+        </Button>
         {flagMode &&
-          <button className='border-2 cursor-pointer' onClick={() => {
+          <Button onClick={() => {
             const event = new MouseEvent('dblclick', {
               'view': window,
               'bubbles': true,
@@ -170,13 +177,13 @@ export const Chart = ({ data, flags }: Props) => {
             }}
           >
             clear selection
-          </button>
+          </Button>
         }
         <UplotReact
           options={opts}
           data={data as AlignedData}
           // target={target}
-          // onCreate={(chart) => {}}
+          onCreate={(chart) => {plotRef.current = chart}}
           // onDelete={(chart) => {}}
           // resetScales={true}
         />
