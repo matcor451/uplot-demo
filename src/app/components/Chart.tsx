@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import uPlot, { AlignedData, Options } from 'uplot';
 import UplotReact from 'uplot-react';
 import 'uplot/dist/uPlot.min.css';
@@ -45,6 +45,23 @@ export const Chart = ({ data, flags }: Props) => {
   const containerDiv = useRef<HTMLDivElement>(null)
   const plotRef = useRef<uPlot>(null)
 
+  useEffect(() => {
+    const handleResize = () => {
+        if (plotRef.current && containerDiv.current) {
+          plotRef.current.setSize({
+            width: containerDiv.current?.clientWidth,
+            height: plotRef.current.height
+          })
+        }
+    }
+
+    window.addEventListener("resize", handleResize);
+    handleResize() // Call now to set initial size
+    return () => {
+        window.removeEventListener("resize", handleResize);
+    }
+  }, [])
+
   const toggleDark = () => {
     if (!containerDiv.current) return
     if (containerDiv.current.className.includes('invert')) {
@@ -85,7 +102,7 @@ export const Chart = ({ data, flags }: Props) => {
 
   const opts: Options = {
     title: "Test Plot",
-    width: 800,
+    width: containerDiv.current ? containerDiv.current.clientWidth : 800,
     height: 600,
     cursor: {
       drag: {
