@@ -19,20 +19,20 @@ const initHook = (u: uPlot) => {
   u.over.addEventListener(
     "keydown",
     (e) => {
-      const xStep = 0.5
-      // const xStep = (u.scales.x.max! - u.scales.x.min!) * 0.1
-      const yStep = 2
-      // const yStep = (u.scales['%'].max! - u.scales['%'].min!) * 0.1
+      // const xStep = 0.5
+      const xStep = (u.scales.x.max! - u.scales.x.min!) * 0.1
+      // const yStep = 2
+      const yStep = (u.scales['y'].max! - u.scales['y'].min!) * 0.1
       if (e.key === "ArrowLeft") {
         u.setScale('x', {min: u.scales.x.min! - xStep, max: u.scales.x.max! - xStep})
-        u.setScale('%', {min: u.scales['%'].min!, max: u.scales['%'].max!})
+        u.setScale('y', {min: u.scales.y.min!, max: u.scales.y.max!})
       } else if (e.key === "ArrowRight") {
         u.setScale('x', {min: u.scales.x.min! + xStep, max: u.scales.x.max! + xStep})
-        u.setScale('%', {min: u.scales['%'].min!, max: u.scales['%'].max!})
+        u.setScale('y', {min: u.scales.y.min!, max: u.scales.y.max!})
       } else if (e.key === 'ArrowUp') {
-        u.setScale('%', {min: u.scales['%'].min! + yStep, max: u.scales['%'].max! + yStep})
+        u.setScale('y', {min: u.scales.y.min! + yStep, max: u.scales.y.max! + yStep})
       } else if (e.key === 'ArrowDown') {
-        u.setScale('%', {min: u.scales['%'].min! - yStep, max: u.scales['%'].max! - yStep})
+        u.setScale('y', {min: u.scales.y.min! - yStep, max: u.scales.y.max! - yStep})
       }
     },
     true
@@ -65,12 +65,8 @@ export const Chart = ({ data, flags }: Props) => {
 
     const leftIdx = u.posToIdx(lft);
     const rightIdx = u.posToIdx(rgt);
-    const topVal = u.posToVal(top, '%')
-    const bottomVal = u.posToVal(bottom, '%')
-
-    // console.log('select range:')
-    // console.log('x:', u.data[0][leftIdx], u.data[0][rightIdx])
-    // console.log('y:', bottomVal, topVal)
+    const topVal = u.posToVal(top, 'y')
+    const bottomVal = u.posToVal(bottom, 'y')
 
     const pointsToFlag: number[][] = []
     u.data.slice(1).forEach(x => {
@@ -124,7 +120,7 @@ export const Chart = ({ data, flags }: Props) => {
     },
     hooks: {
       init: [initHook],
-      setSelect: flagMode ? onFlag : [],
+      setSelect: flagMode ? onFlag : []
     },
     plugins: [
       seriesPointsPlugin(flags)
@@ -133,15 +129,19 @@ export const Chart = ({ data, flags }: Props) => {
     scales: {
       x: {
         time: false,
-        // min: data[0][0] - 0.25,
-        // max: data[0].slice(-1)[0] + 0.25
+        min: plotRef.current ? plotRef.current.scales.x.min : undefined,
+        max: plotRef.current ? plotRef.current.scales.x.max : undefined,
+      },
+      'y': {
+        min: plotRef.current ? plotRef.current.scales.y.min : undefined,
+        max: plotRef.current ? plotRef.current.scales.y.max : undefined,
       }
     },
     axes: [
       {},
       {
-        scale: "%",
-        values: (u, vals) => vals.map(v => +v.toFixed(1) + "%"),
+        scale: 'y',
+        values: (u, vals) => vals.map(v => v.toFixed(1)),
       }
     ],
   };
@@ -168,12 +168,10 @@ export const Chart = ({ data, flags }: Props) => {
         </Button>
         {flagMode &&
           <Button onClick={() => {
-            const event = new MouseEvent('dblclick', {
-              'view': window,
-              'bubbles': true,
-              'cancelable': true
-            });
-            document.getElementsByClassName('u-over')[0].dispatchEvent(event)
+            if (plotRef.current) {
+              plotRef.current.setSelect({left: 0, top: 0, width: 0, height: 0})
+              plotRef.current.root.querySelector(".u-select")?.classList.remove('border', 'border-dashed');
+            }
             }}
           >
             clear selection

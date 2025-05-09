@@ -35,7 +35,7 @@ export const seriesFromData = (data: number[][], flags: Flag[]) => {
   data.slice(1).forEach((x, i) => {
     seriesArray.push({
       label: `Plot ${i}`,
-      scale: '%',
+      scale: 'y',
       // paths: () => null,
       // points: {
       //   space: 0,

@@ -1,5 +1,5 @@
 import { Chart } from "./components/Chart";
-// import { random, range } from 'lodash'
+import { random, range } from 'lodash'
 
 export interface Flag {
   seriesIndex: number
@@ -8,7 +8,7 @@ export interface Flag {
   flag: string
 }
 
-const simpleData = [
+export const simpleData = [
   [1,2,3,4,5],
   [10,20,30,40,50],
   [5,4,60,20,14],
@@ -16,11 +16,11 @@ const simpleData = [
   [1,2,3,4,5]
 ]
 
-// const bigData = [
-//   range(500_000),
-//   range(500_000).map(i => (10 + random(0, 5, true)) * Math.sin(i / 500)),
-//   range(500_000).map(i => 5 * Math.cos(i / 500)),
-// ]
+export const bigData = [
+  range(500_000),
+  range(500_000).map(i => (10 + random(0, 5, true)) * Math.sin(i / 500)),
+  range(500_000).map(i => 5 * Math.cos(i / 500)),
+]
 
 export default function Home() {
   const flags: Flag[] = [
