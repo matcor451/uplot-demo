@@ -1,13 +1,15 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react';
-import uPlot, { AlignedData, Options } from 'uplot';
-import UplotReact from 'uplot-react';
-import 'uplot/dist/uPlot.min.css';
-import { seriesFromData } from './utils';
-import { seriesPointsPlugin } from './plugins';
-import { Flag } from '../page';
-import { Button } from './Button';
-import { onKeyDown } from './eventHandlers';
+import React, { useEffect, useRef, useState } from 'react'
+
+import uPlot, { AlignedData, Options } from 'uplot'
+import UplotReact from 'uplot-react'
+
+import 'uplot/dist/uPlot.min.css'
+import { seriesPointsPlugin } from './plugins'
+import { seriesFromData } from './utils'
+import { Flag } from '../page'
+import { Button } from './Button'
+import { onKeyDown } from './eventHandlers'
 
 interface Props {
   data: number[][]
@@ -15,13 +17,13 @@ interface Props {
 }
 
 const initHook = (u: uPlot) => {
-  u.over.tabIndex = -1; // required for key handlers
+  u.over.tabIndex = -1 // required for key handlers
 
   u.over.addEventListener(
-    "keydown",
+    'keydown',
     onKeyDown(u),
     true
-  );
+  )
 }
 
 export const Chart = ({ data, flags }: Props) => {
@@ -32,18 +34,18 @@ export const Chart = ({ data, flags }: Props) => {
 
   useEffect(() => {
     const handleResize = () => {
-        if (plotRef.current && containerDiv.current) {
-          plotRef.current.setSize({
-            width: containerDiv.current?.clientWidth,
-            height: plotRef.current.height
-          })
-        }
+      if (plotRef.current && containerDiv.current) {
+        plotRef.current.setSize({
+          width: containerDiv.current?.clientWidth,
+          height: plotRef.current.height
+        })
+      }
     }
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize)
     handleResize() // Call now to set initial size
     return () => {
-        window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize)
     }
   }, [])
 
@@ -54,26 +56,25 @@ export const Chart = ({ data, flags }: Props) => {
     } else {
       containerDiv.current.className = 'w-full bg-[#ededed] invert'
     }
-    
   }
 
   const series = seriesFromData(data, flags)
 
   const onFlag = [(u: uPlot) => {
-    const lft = u.select.left;
-    const rgt = u.select.width + lft;
+    const lft = u.select.left
+    const rgt = u.select.width + lft
     const top = u.select.top
     const bottom = u.select.height + top
 
-    const leftIdx = u.posToIdx(lft);
-    const rightIdx = u.posToIdx(rgt);
+    const leftIdx = u.posToIdx(lft)
+    const rightIdx = u.posToIdx(rgt)
     const topVal = u.posToVal(top, 'y')
     const bottomVal = u.posToVal(bottom, 'y')
 
     const pointsToFlag: number[][] = []
     u.data.slice(1).forEach(x => {
       for (let i = leftIdx; i <= rightIdx; i++) {
-        const xPos = u.valToPos(i+1, 'x')
+        const xPos = u.valToPos(i + 1, 'x')
         if (xPos < lft || xPos > rgt) continue
         const val = x[i]
         if (val === undefined || val === null) continue
@@ -86,7 +87,7 @@ export const Chart = ({ data, flags }: Props) => {
   }]
 
   const opts: Options = {
-    title: "Test Plot",
+    title: 'Test Plot',
     width: containerDiv.current ? containerDiv.current.clientWidth : 800,
     height: 600,
     cursor: {
@@ -103,9 +104,9 @@ export const Chart = ({ data, flags }: Props) => {
         mousedown: (u, targ, handler) => {
           return e => {
             handler(e)
-            if (e.button == 0) {
+            if (e.button === 0) {
               if (flagMode) {
-                u.root.querySelector(".u-select")?.classList.add('border', 'border-dashed');
+                u.root.querySelector('.u-select')?.classList.add('border', 'border-dashed')
               }
             }
             return null
@@ -114,7 +115,7 @@ export const Chart = ({ data, flags }: Props) => {
         dblclick: (u, targ, handler) => {
           return e => {
             handler(e)
-            u.root.querySelector(".u-select")?.classList.remove('border', 'border-dashed');
+            u.root.querySelector('.u-select')?.classList.remove('border', 'border-dashed')
             return null
           }
         }
@@ -127,66 +128,66 @@ export const Chart = ({ data, flags }: Props) => {
     plugins: [
       seriesPointsPlugin(flags)
     ],
-    series: series,
+    series,
     scales: {
       x: {
         time: false,
         min: plotRef.current ? plotRef.current.scales.x.min : undefined,
-        max: plotRef.current ? plotRef.current.scales.x.max : undefined,
+        max: plotRef.current ? plotRef.current.scales.x.max : undefined
       },
-      'y': {
+      y: {
         min: plotRef.current ? plotRef.current.scales.y.min : undefined,
-        max: plotRef.current ? plotRef.current.scales.y.max : undefined,
+        max: plotRef.current ? plotRef.current.scales.y.max : undefined
       }
     },
     axes: [
       {},
       {
         scale: 'y',
-        values: (u, vals) => vals.map(v => v.toFixed(1)),
+        values: (u, vals) => vals.map(v => v.toFixed(1))
       }
-    ],
-  };
+    ]
+  }
 
   const onUnZoom = () => {
     const u = plotRef.current
     if (!u) return
-    u.setScale('x', {min: u.data[0][0], max: u.data[0].at(-1)!})
+    u.setScale('x', { min: u.data[0][0], max: u.data[0][u.data.length - 1] })
   }
 
   return (
-      <div
-        ref={containerDiv}
-        className='w-full'
-      >
-        <Button onClick={() => setFlagMode(!flagMode)}>
+    <div
+      ref={containerDiv}
+      className='w-full'
+    >
+      <Button onClick={() => setFlagMode(!flagMode)}>
           Toggle Flag Mode - {flagMode ? 'on' : 'off'}
-        </Button>
-        <Button onClick={onUnZoom}>
+      </Button>
+      <Button onClick={onUnZoom}>
           Reset Zoom
-        </Button>
-        <Button onClick={toggleDark}>
+      </Button>
+      <Button onClick={toggleDark}>
           Toggle Dark Mode
-        </Button>
-        {flagMode &&
+      </Button>
+      {flagMode &&
           <Button onClick={() => {
             if (plotRef.current) {
-              plotRef.current.setSelect({left: 0, top: 0, width: 0, height: 0})
-              plotRef.current.root.querySelector(".u-select")?.classList.remove('border', 'border-dashed');
+              plotRef.current.setSelect({ left: 0, top: 0, width: 0, height: 0 })
+              plotRef.current.root.querySelector('.u-select')?.classList.remove('border', 'border-dashed')
             }
-            }}
+          }}
           >
             clear selection
           </Button>
-        }
-        <UplotReact
-          options={opts}
-          data={data as AlignedData}
-          // target={target}
-          onCreate={(chart) => {plotRef.current = chart}}
-          // onDelete={(chart) => {}}
-          // resetScales={true}
-        />
-      </div>
-  );
+      }
+      <UplotReact
+        options={opts}
+        data={data as AlignedData}
+        // target={target}
+        onCreate={(chart) => { plotRef.current = chart }}
+        // onDelete={(chart) => {}}
+        // resetScales={true}
+      />
+    </div>
+  )
 }

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "classnames": "^2.5.1",
+    "eslint-config-bodc": "^1.2.1",
     "lodash": "^4.17.21",
     "next": "15.3.1",
     "react": "^19.0.0",
@@ -18,15 +19,30 @@
     "uplot-react": "^1.2.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/lodash": "^4.17.16",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "eslintConfig": {
+    "extends": [
+      "bodc"
+    ],
+    "rules": {
+      "react/react-in-jsx-scope": "off",
+      "react/jsx-uses-react": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "no-relative-import-paths/no-relative-import-paths": [
+        "error",
+        {
+          "allowSameFolder": true,
+          "rootDir": "frontend",
+          "prefix": ""
+        }
+      ]
+    }
   }
 }
