@@ -1,6 +1,7 @@
 import uPlot from 'uplot'
 
 export const onKeyDown = (u: uPlot) => (e: KeyboardEvent) => {
+  e.preventDefault()
   // const xStep = 0.5
   const xStep = (u.scales.x.max! - u.scales.x.min!) * 0.1
   // const yStep = 2

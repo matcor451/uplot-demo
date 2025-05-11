@@ -1,20 +1,15 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
 
-import uPlot, { AlignedData, Options } from 'uplot'
+import uPlot, { Options } from 'uplot'
 import UplotReact from 'uplot-react'
 
 import 'uplot/dist/uPlot.min.css'
-import { seriesPointsPlugin } from './plugins'
-import { seriesFromData } from './utils'
-import { Flag } from '../page'
 import { Button } from './Button'
 import { onKeyDown } from './eventHandlers'
-
-interface Props {
-  data: number[][]
-  flags: Flag[]
-}
+import { seriesPointsPlugin } from './plugins'
+import type { ChartProps, IndexedFlag, InnerChartProps } from './types'
+import { seriesFromData } from './utils'
 
 const initHook = (u: uPlot) => {
   u.over.tabIndex = -1 // required for key handlers
@@ -26,7 +21,29 @@ const initHook = (u: uPlot) => {
   )
 }
 
-export const Chart = ({ data, flags }: Props) => {
+export const Chart = ({ data, flags }: ChartProps) => {
+  // Use this layer to:
+  // - transform flags (name -> index) -- DONE
+  // - validate data (x values are in order)
+  const indexedFlags: IndexedFlag[] = flags.map(f => ({
+    ...f,
+    seriesIndex: 1 + data.series.findIndex(x => x.name === f.seriesName)
+  }))
+
+  // for (let i = 1; i < data.xValues.length; i++) {
+  //   if (data.xValues[i] < data.xValues[i - 1]) {
+  //     console.log('x values not in order')
+  //     break
+  //     // TODO - handle this warning in a meaningful way
+  //   }
+  // }
+
+  return (
+    <ChartInner data={data} flags={indexedFlags} />
+  )
+}
+
+const ChartInner = ({ data, flags }: InnerChartProps) => {
   const [flagMode, setFlagMode] = useState(false)
 
   const containerDiv = useRef<HTMLDivElement>(null)
@@ -152,7 +169,7 @@ export const Chart = ({ data, flags }: Props) => {
   const onUnZoom = () => {
     const u = plotRef.current
     if (!u) return
-    u.setScale('x', { min: u.data[0][0], max: u.data[0][u.data.length - 1] })
+    u.setScale('x', { min: u.data[0][0], max: u.data[0][u.data[0].length - 1] })
   }
 
   return (
@@ -182,7 +199,11 @@ export const Chart = ({ data, flags }: Props) => {
       }
       <UplotReact
         options={opts}
-        data={data as AlignedData}
+        // data={[data.xAxis, ...data.yAxes]}
+        data={[
+          data.xValues,
+          ...data.series.map(s => s.values)
+        ]}
         // target={target}
         onCreate={(chart) => { plotRef.current = chart }}
         // onDelete={(chart) => {}}

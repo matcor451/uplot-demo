@@ -1,6 +1,6 @@
 import uPlot from 'uplot'
 
-import { Flag } from '../page'
+import { Data, IndexedFlag } from './types'
 
 const COLOURS = ['#ff0000', '#0000ff', '#00ff00', '#ff00ff']
 
@@ -8,7 +8,7 @@ export const invertHex = (hex: string) => {
   return '#' + (Number(`0x1${hex.replace('#', '')}`) ^ 0xFFFFFF).toString(16).substring(1).toUpperCase()
 }
 
-export const getFlagForPoint = (flags: Flag[], pointIndex: number) => {
+export const getFlagForPoint = (flags: IndexedFlag[], pointIndex: number) => {
   for (let i = 0; i < flags.length; i++) {
     const thisFlag = flags[i]
     if (thisFlag.endIndex === undefined) {
@@ -19,7 +19,7 @@ export const getFlagForPoint = (flags: Flag[], pointIndex: number) => {
   }
 }
 
-export const seriesFromData = (data: number[][], flags: Flag[]) => {
+export const seriesFromData = (data: Data, flags: IndexedFlag[]) => {
   const seriesArray = [{}]
 
   const applyFlag = (value: number | null, seriesIdx: number, pointIndex: number) => {
@@ -32,15 +32,10 @@ export const seriesFromData = (data: number[][], flags: Flag[]) => {
     return value
   }
 
-  data.slice(1).forEach((x, i) => {
+  data.series.forEach((series, i) => {
     seriesArray.push({
-      label: `Plot ${i}`,
+      label: series.label || series.name,
       scale: 'y',
-      // paths: () => null,
-      // points: {
-      //   space: 0,
-      //   filter: //fn here to toggle flagged or not
-      // },
       value: (u: uPlot, v: number, seriesIdx: number, pointIndex: number) => applyFlag(v, seriesIdx, pointIndex),
       stroke: COLOURS[i]
     })
