@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { random, range } from 'lodash'
 
 import { Chart } from './components/Chart'
@@ -9,7 +10,7 @@ export interface Flag {
   flag: string
 }
 
-export const simpleData = [
+const simpleData = [
   [1, 2, 3, 4, 5],
   [10, 20, 30, 40, 50],
   [5, 4, 60, 20, 14],
@@ -17,7 +18,7 @@ export const simpleData = [
   [1, 2, 3, 4, 5]
 ]
 
-export const bigData = [
+const bigData = [
   range(500_000),
   range(500_000).map(i => (10 + random(0, 5, true)) * Math.sin(i / 500)),
   range(500_000).map(i => 5 * Math.cos(i / 500))

@@ -161,24 +161,24 @@ export const Chart = ({ data, flags }: Props) => {
       className='w-full'
     >
       <Button onClick={() => setFlagMode(!flagMode)}>
-          Toggle Flag Mode - {flagMode ? 'on' : 'off'}
+        Toggle Flag Mode - {flagMode ? 'on' : 'off'}
       </Button>
       <Button onClick={onUnZoom}>
-          Reset Zoom
+        Reset Zoom
       </Button>
       <Button onClick={toggleDark}>
-          Toggle Dark Mode
+        Toggle Dark Mode
       </Button>
       {flagMode &&
-          <Button onClick={() => {
-            if (plotRef.current) {
-              plotRef.current.setSelect({ left: 0, top: 0, width: 0, height: 0 })
-              plotRef.current.root.querySelector('.u-select')?.classList.remove('border', 'border-dashed')
-            }
-          }}
-          >
-            clear selection
-          </Button>
+        <Button onClick={() => {
+          if (plotRef.current) {
+            plotRef.current.setSelect({ left: 0, top: 0, width: 0, height: 0 })
+            plotRef.current.root.querySelector('.u-select')?.classList.remove('border', 'border-dashed')
+          }
+        }}
+        >
+          clear selection
+        </Button>
       }
       <UplotReact
         options={opts}

@@ -32,6 +32,7 @@
       "bodc"
     ],
     "rules": {
+      "react/jsx-indent" : ["error", 2],
       "react/react-in-jsx-scope": "off",
       "react/jsx-uses-react": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
