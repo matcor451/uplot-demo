@@ -1,0 +1,14 @@
+.w-full {
+    width: 100%;
+}
+
+.dark-mode {
+    background-color: #ededed;
+    filter: invert(100%);
+}
+
+.flag-select {
+    border-width: 1px;
+    border-style: dashed;
+    background-color: rgba(0, 255, 255, 0.2)!important;
+}

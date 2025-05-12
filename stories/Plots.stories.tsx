@@ -1,8 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { Meta, StoryObj } from '@storybook/react'
 import { random, range } from 'lodash'
 
-import { Chart } from './components/Chart'
-import { Data, Flag } from './components/types'
+import { Chart } from '@/Chart'
+import { Data } from '@/types'
+
+const meta: Meta<typeof Chart> = {
+  component: Chart
+}
+
+export default meta
+type Story = StoryObj<typeof Chart>;
 
 const simpleData: Data = {
   xValues: [1, 2, 3, 4, 5],
@@ -22,20 +29,16 @@ const bigData: Data = {
   ]
 }
 
-export default function Home () {
-  const flags: Flag[] = [
-    { seriesName: 'PARAM01', pointIndex: 1, endIndex: 4, flag: 'X' }
-  ]
+export const SmallDataset: Story = {
+  args: {
+    data: simpleData,
+    flags: [{ seriesName: 'PARAM01', pointIndex: 1, endIndex: 4, flag: 'X' }]
+  }
+}
 
-  const data = simpleData
-  // const data = bigData
-
-  return (
-    <div>
-      <Chart
-        data={data}
-        flags={flags}
-      />
-    </div>
-  )
+export const LargeDataset: Story = {
+  args: {
+    data: bigData,
+    flags: [{ seriesName: 'PARAM01', pointIndex: 1, endIndex: 4, flag: 'X' }]
+  }
 }

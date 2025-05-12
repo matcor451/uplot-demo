@@ -4,12 +4,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import uPlot, { Options } from 'uplot'
 import UplotReact from 'uplot-react'
 
-import 'uplot/dist/uPlot.min.css'
 import { Button } from './Button'
-import { onKeyDown } from './eventHandlers'
-import { seriesPointsPlugin } from './plugins'
-import type { ChartProps, IndexedFlag, InnerChartProps } from './types'
-import { seriesFromData } from './utils'
+import { onKeyDown } from '../eventHandlers'
+import { seriesPointsPlugin } from '../plugins'
+import type { InnerChartProps } from '../types'
+import { seriesFromData } from '../utils'
 
 const initHook = (u: uPlot) => {
   u.over.tabIndex = -1 // required for key handlers
@@ -21,29 +20,7 @@ const initHook = (u: uPlot) => {
   )
 }
 
-export const Chart = ({ data, flags }: ChartProps) => {
-  // Use this layer to:
-  // - transform flags (name -> index) -- DONE
-  // - validate data (x values are in order)
-  const indexedFlags: IndexedFlag[] = flags.map(f => ({
-    ...f,
-    seriesIndex: 1 + data.series.findIndex(x => x.name === f.seriesName)
-  }))
-
-  // for (let i = 1; i < data.xValues.length; i++) {
-  //   if (data.xValues[i] < data.xValues[i - 1]) {
-  //     console.log('x values not in order')
-  //     break
-  //     // TODO - handle this warning in a meaningful way
-  //   }
-  // }
-
-  return (
-    <ChartInner data={data} flags={indexedFlags} />
-  )
-}
-
-const ChartInner = ({ data, flags }: InnerChartProps) => {
+export const ChartInner = ({ data, flags }: InnerChartProps) => {
   const [flagMode, setFlagMode] = useState(false)
 
   const containerDiv = useRef<HTMLDivElement>(null)
@@ -68,10 +45,10 @@ const ChartInner = ({ data, flags }: InnerChartProps) => {
 
   const toggleDark = () => {
     if (!containerDiv.current) return
-    if (containerDiv.current.className.includes('invert')) {
-      containerDiv.current.className = 'w-full'
+    if (containerDiv.current.className.includes('dark-mode')) {
+      containerDiv.current.classList.remove('dark-mode')
     } else {
-      containerDiv.current.className = 'w-full bg-[#ededed] invert'
+      containerDiv.current.classList.add('dark-mode')
     }
   }
 
@@ -123,7 +100,7 @@ const ChartInner = ({ data, flags }: InnerChartProps) => {
             handler(e)
             if (e.button === 0) {
               if (flagMode) {
-                u.root.querySelector('.u-select')?.classList.add('border', 'border-dashed')
+                u.root.querySelector('.u-select')?.classList.add('flag-select')
               }
             }
             return null
@@ -132,7 +109,7 @@ const ChartInner = ({ data, flags }: InnerChartProps) => {
         dblclick: (u, targ, handler) => {
           return e => {
             handler(e)
-            u.root.querySelector('.u-select')?.classList.remove('border', 'border-dashed')
+            u.root.querySelector('.u-select')?.classList.remove('flag-select')
             return null
           }
         }
@@ -175,7 +152,7 @@ const ChartInner = ({ data, flags }: InnerChartProps) => {
   return (
     <div
       ref={containerDiv}
-      className='w-full'
+      style={{ width: '100%' }}
     >
       <Button onClick={() => setFlagMode(!flagMode)}>
         Toggle Flag Mode - {flagMode ? 'on' : 'off'}
