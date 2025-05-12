@@ -24,9 +24,15 @@ export interface ChartProps {
   data: Data
   flags?: Flag[]
   plotColours?: string[]
+  buttonClassname?: string
 }
 
 export interface InnerChartProps {
   data: Data
   flags: IndexedFlag[]
+}
+
+export interface ChartContextValue {
+  colours: string[]
+  buttonClassname: string
 }

@@ -4,6 +4,8 @@ import { random, range } from 'lodash'
 import { Chart } from '@/Chart'
 import { Data } from '@/types'
 
+import './styles.css'
+
 const meta: Meta<typeof Chart> = {
   component: Chart
 }
@@ -46,5 +48,12 @@ export const CustomColours: Story = {
   args: {
     data: simpleData,
     plotColours: ['magenta', 'orange']
+  }
+}
+
+export const CustomButtonStyle: Story = {
+  args: {
+    data: simpleData,
+    buttonClassname: 'styled-button'
   }
 }
