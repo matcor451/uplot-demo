@@ -22,7 +22,8 @@ export interface Data {
 
 export interface ChartProps {
   data: Data
-  flags: Flag[]
+  flags?: Flag[]
+  plotColours?: string[]
 }
 
 export interface InnerChartProps {

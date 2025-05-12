@@ -38,7 +38,13 @@ export const SmallDataset: Story = {
 
 export const LargeDataset: Story = {
   args: {
-    data: bigData,
-    flags: [{ seriesName: 'PARAM01', pointIndex: 1, endIndex: 4, flag: 'X' }]
+    data: bigData
+  }
+}
+
+export const CustomColours: Story = {
+  args: {
+    data: simpleData,
+    plotColours: ['magenta', 'orange']
   }
 }
