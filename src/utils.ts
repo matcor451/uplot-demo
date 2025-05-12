@@ -2,9 +2,8 @@ import { useContext } from 'react'
 
 import uPlot from 'uplot'
 
-import { Data, IndexedFlag } from './types'
-
 import { ChartContext } from './Chart'
+import { Data, IndexedFlag } from './types'
 
 export const getColour = (index: number) => {
   const { colours } = useContext(ChartContext)

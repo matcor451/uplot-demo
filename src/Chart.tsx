@@ -1,12 +1,12 @@
 'use client'
+import { createContext } from 'react'
 
 import { ChartInner } from './components/ChartInner'
+import { DEFAULT_COLOURS } from './constants'
 import type { ChartContextValue, ChartProps, IndexedFlag } from './types'
 
 import './style.css'
 import 'uplot/dist/uPlot.min.css'
-import { createContext } from 'react'
-import { DEFAULT_COLOURS } from './constants'
 
 export const ChartContext = createContext<ChartContextValue>({
   colours: DEFAULT_COLOURS,
