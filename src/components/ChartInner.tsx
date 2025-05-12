@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import uPlot, { Options } from 'uplot'
 import UplotReact from 'uplot-react'
@@ -9,6 +9,7 @@ import { onKeyDown } from '../eventHandlers'
 import { seriesPointsPlugin } from '../plugins'
 import type { InnerChartProps } from '../types'
 import { seriesFromData } from '../utils'
+import { ChartContext } from '@/Chart'
 
 const initHook = (u: uPlot) => {
   u.over.tabIndex = -1 // required for key handlers
@@ -22,6 +23,8 @@ const initHook = (u: uPlot) => {
 
 export const ChartInner = ({ data, flags }: InnerChartProps) => {
   const [flagMode, setFlagMode] = useState(false)
+
+  const { colours: plotColours } = useContext(ChartContext)
 
   const containerDiv = useRef<HTMLDivElement>(null)
   const plotRef = useRef<uPlot>(null)
@@ -52,7 +55,7 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
     }
   }
 
-  const series = seriesFromData(data, flags)
+  const series = seriesFromData(data, flags, plotColours)
 
   const onFlag = [(u: uPlot) => {
     const lft = u.select.left

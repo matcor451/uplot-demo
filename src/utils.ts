@@ -1,15 +1,6 @@
-import { useContext } from 'react'
-
 import uPlot from 'uplot'
 
-import { ChartContext } from './Chart'
 import { Data, IndexedFlag } from './types'
-
-export const getColour = (index: number) => {
-  const { colours } = useContext(ChartContext)
-
-  return colours[index % colours.length]
-}
 
 export const invertHex = (hex: string) => {
   return '#' + (Number(`0x1${hex.replace('#', '')}`) ^ 0xFFFFFF).toString(16).substring(1).toUpperCase()
@@ -26,7 +17,7 @@ export const getFlagForPoint = (flags: IndexedFlag[], pointIndex: number) => {
   }
 }
 
-export const seriesFromData = (data: Data, flags: IndexedFlag[]) => {
+export const seriesFromData = (data: Data, flags: IndexedFlag[], colours: string[]) => {
   const seriesArray = [{}]
 
   const applyFlag = (value: number | null, seriesIdx: number, pointIndex: number) => {
@@ -44,7 +35,7 @@ export const seriesFromData = (data: Data, flags: IndexedFlag[]) => {
       label: series.label || series.name,
       scale: 'y',
       value: (u: uPlot, v: number, seriesIdx: number, pointIndex: number) => applyFlag(v, seriesIdx, pointIndex),
-      stroke: getColour(i)
+      stroke: colours[i % colours.length]
     })
   })
 
