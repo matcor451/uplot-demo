@@ -1,4 +1,3 @@
-'use client'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import uPlot, { Options } from 'uplot'
@@ -9,7 +8,7 @@ import { onKeyDown } from '../eventHandlers'
 import { seriesPointsPlugin } from '../plugins'
 import type { InnerChartProps } from '../types'
 import { seriesFromData } from '../utils'
-import { ChartContext } from '@/Chart'
+import { ChartContext } from '@/ChartContext'
 
 const initHook = (u: uPlot) => {
   u.over.tabIndex = -1 // required for key handlers

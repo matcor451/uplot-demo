@@ -1,6 +1,6 @@
 import { ReactNode, useContext } from 'react'
 
-import { ChartContext } from '@/Chart'
+import { ChartContext } from '@/ChartContext'
 
 interface ButtonProps {
   children: ReactNode
