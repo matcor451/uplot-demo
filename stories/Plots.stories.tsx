@@ -14,7 +14,7 @@ export default meta
 type Story = StoryObj<typeof Chart>;
 
 const simpleData: Data = {
-  xValues: [1, 2, 3, 4, 5],
+  xValues: [11, 12, 13, 14, 15],
   series: [
     { name: 'PARAM01', values: [10, 20, 30, 40, 50] },
     { name: 'PARAM02', values: [5, 4, 60, 20, 14] },

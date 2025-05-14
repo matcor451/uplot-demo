@@ -1,17 +1,23 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 
-import uPlot, { Options } from 'uplot'
+import type uPlot from 'uplot'
+import type { Options } from 'uplot'
 import UplotReact from 'uplot-react'
 
 import { Button } from './Button'
 import { onKeyDown } from '../eventHandlers'
 import { seriesPointsPlugin } from '../plugins'
-import type { InnerChartProps } from '../types'
+import type { IndexedFlaggedPoint, ISelectedPoints, InnerChartProps } from '../types'
 import { seriesFromData } from '../utils'
 import { ChartContext } from '@/ChartContext'
+import { FLAGS } from '@/constants'
 
-const initHook = (u: uPlot) => {
+const initHook = (u: uPlot, flagMode: boolean) => {
   u.over.tabIndex = -1 // required for key handlers
+
+  if (flagMode) {
+    u.root.querySelector('.u-select')?.classList.add('flag-select')
+  }
 
   u.over.addEventListener(
     'keydown',
@@ -20,13 +26,14 @@ const initHook = (u: uPlot) => {
   )
 }
 
-export const ChartInner = ({ data, flags }: InnerChartProps) => {
+export const ChartInner = ({ data, flags, flagCallback }: InnerChartProps) => {
   const [flagMode, setFlagMode] = useState(false)
 
   const { colours: plotColours } = useContext(ChartContext)
 
   const containerDiv = useRef<HTMLDivElement>(null)
   const plotRef = useRef<uPlot>(null)
+  const flagSelect = useRef<HTMLSelectElement>(null)
 
   useEffect(() => {
     const handleResize = () => {
@@ -45,6 +52,12 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
     }
   }, [])
 
+  useEffect(() => {
+    if (!flagMode) {
+      clearSelection()
+    }
+  }, [flagMode])
+
   const toggleDark = () => {
     if (!containerDiv.current) return
     if (containerDiv.current.className.includes('dark-mode')) {
@@ -56,7 +69,9 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
 
   const series = seriesFromData(data, flags, plotColours)
 
-  const onFlag = [(u: uPlot) => {
+  const applyFlags = () => {
+    if (!plotRef.current) return
+    const u = plotRef.current
     const lft = u.select.left
     const rgt = u.select.width + lft
     const top = u.select.top
@@ -67,23 +82,48 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
     const topVal = u.posToVal(top, 'y')
     const bottomVal = u.posToVal(bottom, 'y')
 
-    const pointsToFlag: number[][] = []
-    u.data.slice(1).forEach(x => {
+    const pointsToFlag: ISelectedPoints = {}
+    u.data.slice(1).forEach((x, seriesIndex) => {
+      pointsToFlag[seriesIndex] = []
       for (let i = leftIdx; i <= rightIdx; i++) {
-        const xPos = u.valToPos(i + 1, 'x')
+        const xPos = u.valToPos(u.data[0][i], 'x')
         if (xPos < lft || xPos > rgt) continue
         const val = x[i]
         if (val === undefined || val === null) continue
         if (val >= bottomVal && val <= topVal) {
-          pointsToFlag.push([i, val])
+          pointsToFlag[seriesIndex].push(i)
         }
       }
     })
-    console.log(pointsToFlag)
-  }]
+    const flag = flagSelect.current?.value
+    const updatedFlags: IndexedFlaggedPoint[] = [...flags]
+    if (flag) {
+      Object.keys(pointsToFlag).forEach(idx => {
+        const seriesIndex = Number(idx)
+        const seriesName = data.series[seriesIndex].name
+        pointsToFlag[seriesIndex].forEach(pointIndex => {
+          updatedFlags.push({
+            seriesIndex,
+            seriesName,
+            pointIndex,
+            flag
+          })
+        })
+      })
+    }
+    if (flagCallback) {
+      flagCallback(updatedFlags)
+    }
+  }
+
+  const clearSelection = () => {
+    if (plotRef.current) {
+      plotRef.current.setSelect({ left: 0, top: 0, width: 0, height: 0 })
+      plotRef.current.root.querySelector('.u-select')?.classList.remove('flag-select')
+    }
+  }
 
   const opts: Options = {
-    title: 'Test Plot',
     width: containerDiv.current ? containerDiv.current.clientWidth : 800,
     height: 600,
     cursor: {
@@ -97,7 +137,7 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
         bias: 0
       },
       bind: {
-        mousedown: (u, targ, handler) => {
+        mousedown: (u, _target, handler) => {
           return e => {
             handler(e)
             if (e.button === 0) {
@@ -108,7 +148,7 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
             return null
           }
         },
-        dblclick: (u, targ, handler) => {
+        dblclick: (u, _target, handler) => {
           return e => {
             handler(e)
             u.root.querySelector('.u-select')?.classList.remove('flag-select')
@@ -118,8 +158,8 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
       }
     },
     hooks: {
-      init: [initHook],
-      setSelect: flagMode ? onFlag : []
+      init: [(u) => initHook(u, flagMode)]
+      // setSelect: flagMode ? [onFlag] : []
     },
     plugins: [
       seriesPointsPlugin(flags)
@@ -136,12 +176,10 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
         max: plotRef.current ? plotRef.current.scales.y.max : undefined
       }
     },
+    select: plotRef.current ? plotRef.current.select : undefined,
     axes: [
       {},
-      {
-        scale: 'y',
-        values: (u, vals) => vals.map(v => v.toFixed(1))
-      }
+      { scale: 'y' }
     ]
   }
 
@@ -156,37 +194,39 @@ export const ChartInner = ({ data, flags }: InnerChartProps) => {
       ref={containerDiv}
       style={{ width: '100%' }}
     >
-      <Button onClick={() => setFlagMode(!flagMode)}>
-        Toggle Flag Mode - {flagMode ? 'on' : 'off'}
-      </Button>
-      <Button onClick={onUnZoom}>
-        Reset Zoom
-      </Button>
-      <Button onClick={toggleDark}>
-        Toggle Dark Mode
-      </Button>
-      {flagMode &&
-        <Button onClick={() => {
-          if (plotRef.current) {
-            plotRef.current.setSelect({ left: 0, top: 0, width: 0, height: 0 })
-            plotRef.current.root.querySelector('.u-select')?.classList.remove('border', 'border-dashed')
-          }
-        }}
-        >
-          clear selection
+      {/* Control bar */}
+      <div>
+        <Button onClick={() => setFlagMode(!flagMode)}>
+          Toggle Flag Mode - {flagMode ? 'on' : 'off'}
         </Button>
-      }
+        <Button onClick={onUnZoom}>
+          Reset Zoom
+        </Button>
+        <Button onClick={toggleDark}>
+          Toggle Dark Mode
+        </Button>
+      </div>
+      <div>
+        {flagMode &&
+          <div>
+            <select ref={flagSelect}>
+              <option></option>
+              {FLAGS.map(x => <option key={x}>{x}</option>)}
+            </select>
+            <Button onClick={applyFlags}>Apply flags</Button>
+            <Button onClick={clearSelection}>clear selection</Button>
+          </div>
+        }
+      </div>
+      {/* End control bar  */}
+
       <UplotReact
         options={opts}
-        // data={[data.xAxis, ...data.yAxes]}
         data={[
           data.xValues,
           ...data.series.map(s => s.values)
         ]}
-        // target={target}
         onCreate={(chart) => { plotRef.current = chart }}
-        // onDelete={(chart) => {}}
-        // resetScales={true}
       />
     </div>
   )

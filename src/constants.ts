@@ -9,3 +9,5 @@ export const DEFAULT_COLOURS = [
   '#b3d4ff',
   '#00bfa0'
 ]
+
+export const FLAGS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ<>'.split('')

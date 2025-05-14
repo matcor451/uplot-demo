@@ -1,11 +1,11 @@
-export interface Flag {
+export interface FlaggedPoint {
   seriesName: string
   pointIndex: number
   endIndex?: number
   flag: string
 }
 
-export interface IndexedFlag extends Flag {
+export interface IndexedFlaggedPoint extends FlaggedPoint {
   seriesIndex: number
 }
 
@@ -22,17 +22,22 @@ export interface Data {
 
 export interface ChartProps {
   data: Data
-  flags?: Flag[]
+  flags?: FlaggedPoint[]
   plotColours?: string[]
   buttonClassname?: string
+  flagCallback?: (flags: FlaggedPoint[]) => void
 }
 
-export interface InnerChartProps {
+export interface InnerChartProps extends ChartProps {
   data: Data
-  flags: IndexedFlag[]
+  flags: IndexedFlaggedPoint[]
 }
 
 export interface ChartContextValue {
   colours: string[]
   buttonClassname: string
+}
+
+export interface ISelectedPoints {
+  [seriesIndex: number]: number[] // array of point indices
 }

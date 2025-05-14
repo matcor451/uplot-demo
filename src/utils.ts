@@ -1,12 +1,12 @@
 import uPlot from 'uplot'
 
-import { Data, IndexedFlag } from './types'
+import { Data, IndexedFlaggedPoint } from './types'
 
 export const invertHex = (hex: string) => {
   return '#' + (Number(`0x1${hex.replace('#', '')}`) ^ 0xFFFFFF).toString(16).substring(1).toUpperCase()
 }
 
-export const getFlagForPoint = (flags: IndexedFlag[], pointIndex: number) => {
+export const getFlagForPoint = (flags: IndexedFlaggedPoint[], pointIndex: number) => {
   for (let i = 0; i < flags.length; i++) {
     const thisFlag = flags[i]
     if (thisFlag.endIndex === undefined) {
@@ -17,7 +17,7 @@ export const getFlagForPoint = (flags: IndexedFlag[], pointIndex: number) => {
   }
 }
 
-export const seriesFromData = (data: Data, flags: IndexedFlag[], colours: string[]) => {
+export const seriesFromData = (data: Data, flags: IndexedFlaggedPoint[], colours: string[]) => {
   const seriesArray = [{}]
 
   const applyFlag = (value: number | null, seriesIdx: number, pointIndex: number) => {
